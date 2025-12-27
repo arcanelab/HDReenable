@@ -1,7 +1,7 @@
 import Foundation
 
 protocol PollerDelegate: AnyObject {
-    func pollerDidTick()
+    func pollerDidTick(hdrEnabled: Bool)
 }
 
 class Poller {
@@ -37,12 +37,14 @@ class Poller {
     }
 
     @objc private func tick() {
-        delegate?.pollerDidTick()
-        // on each tick, check HDR and enable if needed
+        // on each tick, check HDR once, try enable if needed, then notify delegate with result
         DispatchQueue.global(qos: .utility).async {
             let enabled = self.displayManager.isHDREnabled()
             if !enabled {
                 _ = self.displayManager.tryEnableHDR()
+            }
+            DispatchQueue.main.async {
+                self.delegate?.pollerDidTick(hdrEnabled: enabled)
             }
         }
     }

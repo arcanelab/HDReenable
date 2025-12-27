@@ -91,15 +91,9 @@ class StatusBarController: NSObject, PollerDelegate {
     }
 
     // MARK: - PollerDelegate
-    func pollerDidTick() {
-        // Poller triggered — query HDR state and update menu
-        DispatchQueue.global(qos: .background).async {
-            let dm = DisplayManager()
-            let s = dm.isHDREnabled()
-            DispatchQueue.main.async {
-                self.hdrState = s
-                self.updateHDRMenu()
-            }
-        }
+    func pollerDidTick(hdrEnabled: Bool) {
+        // Poller provided the HDR state to avoid duplicate checks
+        self.hdrState = hdrEnabled
+        self.updateHDRMenu()
     }
 }
