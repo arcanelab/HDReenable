@@ -7,7 +7,6 @@ final class Logger {
     private let maxLines = 2000
 
     private init() {
-        // no file logging; keep recent lines in memory only
     }
 
     func log(_ message: String) {

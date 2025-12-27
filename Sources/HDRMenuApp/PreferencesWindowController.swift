@@ -28,8 +28,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         intervalField.translatesAutoresizingMaskIntoConstraints = false
         buildLabel.translatesAutoresizingMaskIntoConstraints = false
         debugScrollView = NSScrollView()
-        debugScrollView.translatesAutoresizingMaskIntoConstraints = false
-        
+        debugScrollView.translatesAutoresizingMaskIntoConstraints = false        
 
         // Configure fields
         intervalField.isEditable = true
@@ -45,6 +44,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         debugTextView.isSelectable = true
         debugTextView.font = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
         debugTextView.string = "No debug info yet."
+        
         // Make the text view resizable inside the scroll view so content is visible
         debugTextView.isVerticallyResizable = true
         debugTextView.isHorizontallyResizable = false
