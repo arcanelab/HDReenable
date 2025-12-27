@@ -25,13 +25,9 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         // Prepare views for Auto Layout
         infoLabel.translatesAutoresizingMaskIntoConstraints = false
         intervalField.translatesAutoresizingMaskIntoConstraints = false
-        refreshButton.translatesAutoresizingMaskIntoConstraints = false
         debugScrollView = NSScrollView()
         debugScrollView.translatesAutoresizingMaskIntoConstraints = false
-        let saveButton = NSButton(title: "Save", target: self, action: #selector(save(_:)))
-        let revertButton = NSButton(title: "Revert", target: self, action: #selector(revert(_:)))
-        saveButton.translatesAutoresizingMaskIntoConstraints = false
-        revertButton.translatesAutoresizingMaskIntoConstraints = false
+        
 
         // Configure fields
         intervalField.isEditable = true
