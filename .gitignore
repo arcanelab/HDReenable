@@ -1,0 +1,20 @@
+# SwiftPM
+.build/
+Packages/
+
+# Xcode
+*.xcworkspace
+xcuserdata/
+*.xccheckout
+DerivedData/
+
+# macOS
+.DS_Store
+
+# Local logs and pid
+hdrenable.log
+hdrenable.pid
+
+# Editor
+.vscode/
+.idea/
