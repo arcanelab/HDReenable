@@ -2,41 +2,40 @@ import Foundation
 
 final class Logger {
     static let shared = Logger()
-
-    private let logURL: URL
     private let queue = DispatchQueue(label: "com.hdrenable.logger")
+    private var buffer: [String] = []
+    private let maxLines = 2000
 
     private init() {
-        let fm = FileManager.default
-        let cwd = URL(fileURLWithPath: fm.currentDirectoryPath)
-        logURL = cwd.appendingPathComponent("hdrenable.log")
+        // no file logging; keep recent lines in memory only
     }
 
     func log(_ message: String) {
         let ts = ISO8601DateFormatter().string(from: Date())
-        let lineForFile = "[\(ts)] \(message)\n"
-        let lineForNotification = "[\(ts)] \(message)"
+        let line = "[\(ts)] \(message)"
 
-        // write to file asynchronously
         queue.async { [weak self] in
             guard let self = self else { return }
-            if let data = lineForFile.data(using: .utf8) {
-                if FileManager.default.fileExists(atPath: self.logURL.path) {
-                    if let fh = try? FileHandle(forWritingTo: self.logURL) {
-                        defer { try? fh.close() }
-                        try? fh.seekToEnd()
-                        try? fh.write(contentsOf: data)
-                    }
-                } else {
-                    try? data.write(to: self.logURL)
-                }
+            // append to in-memory buffer
+            self.buffer.append(line)
+            if self.buffer.count > self.maxLines {
+                self.buffer.removeFirst(self.buffer.count - self.maxLines)
             }
 
-            // post notification on main without trailing newline to avoid double-spacing
+            // post notification on main
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .HDREnableLogAppended, object: lineForNotification)
+                NotificationCenter.default.post(name: .HDREnableLogAppended, object: line)
             }
         }
+    }
+
+    // Return a snapshot of recent lines
+    func recentLines(limit: Int = 200) -> [String] {
+        var copy: [String] = []
+        queue.sync {
+            copy = Array(self.buffer.suffix(limit))
+        }
+        return copy
     }
 }
 

@@ -173,18 +173,13 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         let hdrOn = dm.isHDREnabled()
         lines.append("HDR enabled: \(hdrOn)")
         lines.append("")
-        // Debug: displayplacer removed — no additional mode info available
 
-        // append last lines of hdrenable.log if present
-        let p = FileManager.default.currentDirectoryPath + "/hdrenable.log"
-        if FileManager.default.fileExists(atPath: p) {
-            if let data = try? String(contentsOfFile: p) {
-                let all = data.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-                let tail = all.suffix(200)
-                lines.append("")
-                lines.append("Log (last \(tail.count) lines):")
-                lines.append(contentsOf: tail)
-            }
+        // append last lines from in-memory logger
+        let recent = Logger.shared.recentLines(limit: 200)
+        if !recent.isEmpty {
+            lines.append("")
+            lines.append("Log (last \(recent.count) lines):")
+            lines.append(contentsOf: recent)
         }
 
         DispatchQueue.main.async {
