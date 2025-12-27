@@ -178,7 +178,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         let recent = Logger.shared.recentLines(limit: 200)
         if !recent.isEmpty {
             lines.append("")
-            lines.append("Log (last \(recent.count) lines):")
+            lines.append("Recent log (in-memory, last \(recent.count) lines):")
             lines.append(contentsOf: recent)
         }
 
