@@ -173,16 +173,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         let hdrOn = dm.isHDREnabled()
         lines.append("HDR enabled: \(hdrOn)")
         lines.append("")
-        if DisplayPlacer.isInstalled() {
-            if let out = DisplayPlacer.listOutput() {
-                lines.append("displayplacer output:")
-                lines.append(out)
-            } else {
-                lines.append("displayplacer installed but returned no output")
-            }
-        } else {
-            lines.append("displayplacer not installed (install via Homebrew: brew install jakehilborn/tap/displayplacer)")
-        }
+        lines.append("displayplacer: not used in this SkyLight-only build")
 
         // append last lines of hdrenable.log if present
         let p = FileManager.default.currentDirectoryPath + "/hdrenable.log"
