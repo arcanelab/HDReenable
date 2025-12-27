@@ -173,7 +173,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         let hdrOn = dm.isHDREnabled()
         lines.append("HDR enabled: \(hdrOn)")
         lines.append("")
-        lines.append("displayplacer: not used in this SkyLight-only build")
+        // Debug: displayplacer removed — no additional mode info available
 
         // append last lines of hdrenable.log if present
         let p = FileManager.default.currentDirectoryPath + "/hdrenable.log"
