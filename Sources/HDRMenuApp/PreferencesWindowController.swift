@@ -5,7 +5,6 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
     private let infoLabel = NSTextField(labelWithString: "Polling interval (seconds):")
     private let debugTextView = NSTextView()
     private var debugScrollView: NSScrollView!
-    private let refreshButton = NSButton(title: "Refresh Debug Info", target: nil, action: #selector(refreshDebug(_:)))
 
     init() {
         let contentRect = NSRect(x: 0, y: 0, width: 480, height: 360)
@@ -47,7 +46,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         debugTextView.isEditable = false
         debugTextView.isSelectable = true
         debugTextView.font = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
-        debugTextView.string = "No debug info yet. Click Refresh."
+        debugTextView.string = "No debug info yet."
         // Make the text view resizable inside the scroll view so content is visible
         debugTextView.isVerticallyResizable = true
         debugTextView.isHorizontallyResizable = false
@@ -62,12 +61,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         // Add to content view
         content.addSubview(infoLabel)
         content.addSubview(intervalField)
-        content.addSubview(refreshButton)
-        content.addSubview(saveButton)
-        content.addSubview(revertButton)
         content.addSubview(debugScrollView)
-
-        refreshButton.target = self
 
         // Layout constraints
         NSLayoutConstraint.activate([
@@ -83,36 +77,12 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
             intervalField.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -20),
             intervalField.heightAnchor.constraint(equalToConstant: 24),
 
-            // refreshButton: below intervalField, leading
-            refreshButton.topAnchor.constraint(equalTo: intervalField.bottomAnchor, constant: 12),
-            refreshButton.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 20),
-            refreshButton.heightAnchor.constraint(equalToConstant: 28),
-
-            // saveButton: aligned to refreshButton top, trailing
-            saveButton.centerYAnchor.constraint(equalTo: refreshButton.centerYAnchor),
-            saveButton.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -20),
-            saveButton.widthAnchor.constraint(equalToConstant: 80),
-            saveButton.heightAnchor.constraint(equalToConstant: 30),
-            // revertButton: to the left of saveButton
-            revertButton.centerYAnchor.constraint(equalTo: refreshButton.centerYAnchor),
-            revertButton.trailingAnchor.constraint(equalTo: saveButton.leadingAnchor, constant: -12),
-            revertButton.widthAnchor.constraint(equalToConstant: 80),
-            revertButton.heightAnchor.constraint(equalToConstant: 30),
-
-            // debugScrollView: below buttons, fill remaining space
-            debugScrollView.topAnchor.constraint(equalTo: refreshButton.bottomAnchor, constant: 12),
+            // debugScrollView: below intervalField, fill remaining space
+            debugScrollView.topAnchor.constraint(equalTo: intervalField.bottomAnchor, constant: 12),
             debugScrollView.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 20),
             debugScrollView.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -20),
             debugScrollView.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -20)
         ])
-    }
-
-    @objc private func save(_ sender: Any?) {
-        if let val = Double(intervalField.stringValue), val > 0 {
-            UserDefaults.standard.set(val, forKey: "pollingInterval")
-            NotificationCenter.default.post(name: .pollingIntervalChanged, object: nil)
-        }
-        window?.close()
     }
 
     override func showWindow(_ sender: Any?) {
@@ -146,38 +116,21 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
+        // Save polling interval on close
+        if let val = Double(intervalField.stringValue), val > 0 {
+            UserDefaults.standard.set(val, forKey: "pollingInterval")
+            NotificationCenter.default.post(name: .pollingIntervalChanged, object: nil)
+        }
         NSApp.setActivationPolicy(.accessory)
     }
 
-    @objc private func refreshDebug(_ sender: Any?) {
-        loadDebugInfo()
-    }
 
-    @objc private func revert(_ sender: Any?) {
-        let dm = DisplayManager()
-        let ok = dm.revertToSavedProfile()
-        if ok {
-            loadDebugInfo()
-        } else {
-            // show a simple alert
-            let a = NSAlert()
-            a.messageText = "Revert failed"
-            a.informativeText = "No saved profile found or revert failed. See log for details."
-            a.runModal()
-        }
-    }
 
     private func loadDebugInfo() {
         var lines = [String]()
-        // small header for the in-memory debug log
-        lines.append("Debug log (in-memory):")
-        lines.append("")
-
-        // append last lines from in-memory logger
         let recent = Logger.shared.recentLines(limit: 200)
         if !recent.isEmpty {
             lines.append("")
-            lines.append("Recent log (in-memory, last \(recent.count) lines):")
             lines.append(contentsOf: recent)
         }
 
