@@ -169,9 +169,8 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
 
     private func loadDebugInfo() {
         var lines = [String]()
-        let dm = DisplayManager()
-        let hdrOn = dm.isHDREnabled()
-        lines.append("HDR enabled: \(hdrOn)")
+        // small header for the in-memory debug log
+        lines.append("Debug log (in-memory):")
         lines.append("")
 
         // append last lines from in-memory logger
