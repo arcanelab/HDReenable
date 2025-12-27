@@ -22,10 +22,7 @@ class DisplayManager {
 
     // Detect HDR using SkyLight private APIs when available
     func isHDREnabled() -> Bool {
-        Logger.shared.log("isHDREnabled: starting check")
-
         if SkyLightHDR.shared.available {
-            Logger.shared.log("isHDREnabled: using SkyLight APIs")
             var onlineCount: UInt32 = 0
             var displays = [CGDirectDisplayID](repeating: 0, count: 16)
             let err = CGGetOnlineDisplayList(UInt32(displays.count), &displays, &onlineCount)

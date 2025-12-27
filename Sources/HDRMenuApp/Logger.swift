@@ -14,12 +14,13 @@ final class Logger {
 
     func log(_ message: String) {
         let ts = ISO8601DateFormatter().string(from: Date())
-        let line = "[\(ts)] \(message)\n"
+        let lineForFile = "[\(ts)] \(message)\n"
+        let lineForNotification = "[\(ts)] \(message)"
 
         // write to file asynchronously
         queue.async { [weak self] in
             guard let self = self else { return }
-            if let data = line.data(using: .utf8) {
+            if let data = lineForFile.data(using: .utf8) {
                 if FileManager.default.fileExists(atPath: self.logURL.path) {
                     if let fh = try? FileHandle(forWritingTo: self.logURL) {
                         defer { try? fh.close() }
@@ -31,9 +32,9 @@ final class Logger {
                 }
             }
 
-            // post notification on main
+            // post notification on main without trailing newline to avoid double-spacing
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .HDREnableLogAppended, object: line)
+                NotificationCenter.default.post(name: .HDREnableLogAppended, object: lineForNotification)
             }
         }
     }
