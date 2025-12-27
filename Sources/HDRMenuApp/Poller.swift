@@ -26,8 +26,12 @@ class Poller {
     func start() {
         stop()
         DispatchQueue.main.async {
-            self.timer = Timer.scheduledTimer(timeInterval: self.interval, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
-            RunLoop.main.add(self.timer!, forMode: .common)
+            // Create a timer and add it to the main run loop in common modes.
+            // Use Timer(timeInterval:) + RunLoop.add to avoid double-scheduling the same timer.
+            self.timer = Timer(timeInterval: self.interval, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
+            if let t = self.timer {
+                RunLoop.main.add(t, forMode: .common)
+            }
         }
     }
 
