@@ -10,8 +10,13 @@ let package = Package(
         .executable(name: "HDReenable", targets: ["HDRMenuApp"]),
     ],
     targets: [
+        .target(
+            name: "DisplayPlaceLib",
+            path: "Sources/DisplayPlaceLib"
+        ),
         .executableTarget(
             name: "HDRMenuApp",
+            dependencies: ["DisplayPlaceLib"],
             path: "Sources/HDRMenuApp",
             resources: []
         )

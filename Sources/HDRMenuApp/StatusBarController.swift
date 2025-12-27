@@ -8,6 +8,15 @@ class StatusBarController: NSObject, PollerDelegate {
     override init() {
         super.init()
         constructMenu()
+        // initial status
+        DispatchQueue.global(qos: .background).async {
+            let dm = DisplayManager()
+            let s = dm.isHDREnabled()
+            DispatchQueue.main.async {
+                self.hdrState = s
+                self.updateHDRMenu()
+            }
+        }
     }
 
     private func constructMenu() {
@@ -83,13 +92,13 @@ class StatusBarController: NSObject, PollerDelegate {
 
     // MARK: - PollerDelegate
     func pollerDidTick() {
-        // Poller triggered — update debug UI or state if needed
-        // For skeleton, just refresh the menu label time for visibility
-        DispatchQueue.main.async {
-            if let menu = self.statusItem.menu, let hdrItem = menu.item(withTag: 100) {
-                let date = Date()
-                let fmt = DateFormatter(); fmt.timeStyle = .medium
-                hdrItem.title = (self.hdrState == true ? "HDR: On" : (self.hdrState == false ? "HDR: Off" : "HDR: Unknown")) + " — " + fmt.string(from: date)
+        // Poller triggered — query HDR state and update menu
+        DispatchQueue.global(qos: .background).async {
+            let dm = DisplayManager()
+            let s = dm.isHDREnabled()
+            DispatchQueue.main.async {
+                self.hdrState = s
+                self.updateHDRMenu()
             }
         }
     }

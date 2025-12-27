@@ -14,6 +14,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         window.minSize = NSSize(width: 360, height: 220)
         super.init(window: window)
         window.delegate = self
+        NotificationCenter.default.addObserver(self, selector: #selector(handleLogNotification(_:)), name: .HDREnableLogAppended, object: nil)
         setupUI()
     }
 
@@ -29,7 +30,9 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         debugScrollView = NSScrollView()
         debugScrollView.translatesAutoresizingMaskIntoConstraints = false
         let saveButton = NSButton(title: "Save", target: self, action: #selector(save(_:)))
+        let revertButton = NSButton(title: "Revert", target: self, action: #selector(revert(_:)))
         saveButton.translatesAutoresizingMaskIntoConstraints = false
+        revertButton.translatesAutoresizingMaskIntoConstraints = false
 
         // Configure fields
         intervalField.isEditable = true
@@ -61,6 +64,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         content.addSubview(intervalField)
         content.addSubview(refreshButton)
         content.addSubview(saveButton)
+        content.addSubview(revertButton)
         content.addSubview(debugScrollView)
 
         refreshButton.target = self
@@ -89,6 +93,11 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
             saveButton.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -20),
             saveButton.widthAnchor.constraint(equalToConstant: 80),
             saveButton.heightAnchor.constraint(equalToConstant: 30),
+            // revertButton: to the left of saveButton
+            revertButton.centerYAnchor.constraint(equalTo: refreshButton.centerYAnchor),
+            revertButton.trailingAnchor.constraint(equalTo: saveButton.leadingAnchor, constant: -12),
+            revertButton.widthAnchor.constraint(equalToConstant: 80),
+            revertButton.heightAnchor.constraint(equalToConstant: 30),
 
             // debugScrollView: below buttons, fill remaining space
             debugScrollView.topAnchor.constraint(equalTo: refreshButton.bottomAnchor, constant: 12),
@@ -117,12 +126,45 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         }
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .HDREnableLogAppended, object: nil)
+    }
+
+    @objc private func handleLogNotification(_ note: Notification) {
+        guard let line = note.object as? String else { return }
+        DispatchQueue.main.async {
+            let prev = self.debugTextView.string
+            let combined = prev + "\n" + line
+            self.debugTextView.string = combined
+            // ensure layout updated then scroll to end so text is visible
+            self.debugTextView.layoutSubtreeIfNeeded()
+            let length = (self.debugTextView.string as NSString).length
+            if length > 0 {
+                self.debugTextView.scrollRangeToVisible(NSRange(location: length - 1, length: 1))
+            }
+        }
+    }
+
     func windowWillClose(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
     }
 
     @objc private func refreshDebug(_ sender: Any?) {
         loadDebugInfo()
+    }
+
+    @objc private func revert(_ sender: Any?) {
+        let dm = DisplayManager()
+        let ok = dm.revertToSavedProfile()
+        if ok {
+            loadDebugInfo()
+        } else {
+            // show a simple alert
+            let a = NSAlert()
+            a.messageText = "Revert failed"
+            a.informativeText = "No saved profile found or revert failed. See log for details."
+            a.runModal()
+        }
     }
 
     private func loadDebugInfo() {
@@ -142,8 +184,26 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
             lines.append("displayplacer not installed (install via Homebrew: brew install jakehilborn/tap/displayplacer)")
         }
 
+        // append last lines of hdrenable.log if present
+        let p = FileManager.default.currentDirectoryPath + "/hdrenable.log"
+        if FileManager.default.fileExists(atPath: p) {
+            if let data = try? String(contentsOfFile: p) {
+                let all = data.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+                let tail = all.suffix(200)
+                lines.append("")
+                lines.append("Log (last \(tail.count) lines):")
+                lines.append(contentsOf: tail)
+            }
+        }
+
         DispatchQueue.main.async {
             self.debugTextView.string = lines.joined(separator: "\n")
+            // ensure layout updated then scroll to end so text is visible
+            self.debugTextView.layoutSubtreeIfNeeded()
+            let length = (self.debugTextView.string as NSString).length
+            if length > 0 {
+                self.debugTextView.scrollRangeToVisible(NSRange(location: length - 1, length: 1))
+            }
         }
     }
 }
