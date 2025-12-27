@@ -5,6 +5,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
     private let infoLabel = NSTextField(labelWithString: "Polling interval (seconds):")
     private let debugTextView = NSTextView()
     private var debugScrollView: NSScrollView!
+    private let buildLabel = NSTextField(labelWithString: "")
 
     init() {
         let contentRect = NSRect(x: 0, y: 0, width: 480, height: 360)
@@ -25,6 +26,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         // Prepare views for Auto Layout
         infoLabel.translatesAutoresizingMaskIntoConstraints = false
         intervalField.translatesAutoresizingMaskIntoConstraints = false
+        buildLabel.translatesAutoresizingMaskIntoConstraints = false
         debugScrollView = NSScrollView()
         debugScrollView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -58,6 +60,7 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
         content.addSubview(infoLabel)
         content.addSubview(intervalField)
         content.addSubview(debugScrollView)
+        content.addSubview(buildLabel)
 
         // Layout constraints
         NSLayoutConstraint.activate([
@@ -73,16 +76,27 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
             intervalField.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -20),
             intervalField.heightAnchor.constraint(equalToConstant: 24),
 
-            // debugScrollView: below intervalField, fill remaining space
+            // debugScrollView: below intervalField, fill remaining space above buildLabel
             debugScrollView.topAnchor.constraint(equalTo: intervalField.bottomAnchor, constant: 12),
             debugScrollView.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 20),
             debugScrollView.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -20),
-            debugScrollView.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -20)
+
+            // buildLabel: below debugScrollView
+            buildLabel.topAnchor.constraint(equalTo: debugScrollView.bottomAnchor, constant: 8),
+            buildLabel.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 20),
+            buildLabel.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -20),
+            buildLabel.heightAnchor.constraint(equalToConstant: 18),
+            buildLabel.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -20),
+
+            // set debugScrollView bottom relative to buildLabel top
+            debugScrollView.bottomAnchor.constraint(equalTo: buildLabel.topAnchor, constant: -8)
         ])
     }
 
     override func showWindow(_ sender: Any?) {
         super.showWindow(sender)
+        // update build label and debug info when showing
+        buildLabel.stringValue = "Build: \(self.buildNumberString())"
         loadDebugInfo()
         if let win = self.window {
             win.center()
@@ -139,6 +153,30 @@ class PreferencesWindowController: NSWindowController, NSWindowDelegate {
                 self.debugTextView.scrollRangeToVisible(NSRange(location: length - 1, length: 1))
             }
         }
+    }
+
+    private func buildNumberString() -> String {
+        // Try to read the executable modification time as the build time
+        var exeURL: URL? = nil
+        if let url = Bundle.main.executableURL {
+            exeURL = url
+        } else {
+            exeURL = URL(fileURLWithPath: CommandLine.arguments.first ?? "")
+        }
+
+        if let exe = exeURL {
+            if let attrs = try? FileManager.default.attributesOfItem(atPath: exe.path), let mod = attrs[.modificationDate] as? Date {
+                let df = DateFormatter()
+                df.timeZone = TimeZone.current
+                df.dateFormat = "yyyy.MM.dd-HH:mm:ss"
+                return df.string(from: mod)
+            }
+        }
+        // fallback to now
+        let df = DateFormatter()
+        df.timeZone = TimeZone.current
+        df.dateFormat = "yyyy.MM.dd-HH:mm:ss"
+        return df.string(from: Date())
     }
 }
 

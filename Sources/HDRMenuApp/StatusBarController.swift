@@ -52,15 +52,7 @@ class StatusBarController: NSObject, PollerDelegate {
         statusItem.menu = menu
     }
 
-    @objc func toggleHDR(_ sender: Any?) {
-        // stub: flip local state; real implementation will call display code
-        if let current = hdrState {
-            hdrState = !current
-        } else {
-            hdrState = true
-        }
-        updateHDRMenu()
-    }
+    
 
     @objc func openPreferences(_ sender: Any?) {
         if preferencesWindow == nil {

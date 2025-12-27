@@ -2,24 +2,6 @@ import Foundation
 import CoreGraphics
 
 class DisplayManager {
-    // Save/apply/revert profile helpers are intentionally stubbed
-    // because we removed displayplacer-based mode management.
-
-    func saveCurrentProfile() -> [String]? {
-        Logger.shared.log("saveCurrentProfile: unsupported (DisplayPlaceLib removed)")
-        return nil
-    }
-
-    func applyProfile(_ specs: [String]) -> Bool {
-        Logger.shared.log("applyProfile: unsupported (DisplayPlaceLib removed)")
-        return false
-    }
-
-    func revertToSavedProfile() -> Bool {
-        Logger.shared.log("revertToSavedProfile: unsupported (DisplayPlaceLib removed)")
-        return false
-    }
-
     // Detect HDR using SkyLight private APIs when available
     func isHDREnabled() -> Bool {
         if SkyLightHDR.shared.available {
