@@ -1,7 +1,19 @@
 HDReenable
 ===========
 
-A small macOS menu-bar utility that automatically enables HDR mode on external displays using the SkyLight private APIs. Polling rate is configurable.
+Description
+-----------
+
+HDReenable is a small macOS menu-bar utility that automatically enables HDR mode on external displays using the SkyLight private APIs. Polling rate is configurable.
+
+Motivation
+----------
+
+Sometimes when my Mac wakes from sleep, my external monitor reverts to SDR mode. Having to manually re-enable HDR mode in System Settings repeatedly became tedious, so I created a tool to automate this process.
+
+How it works
+------------
+HDReenable is a menu bar app that runs in the background. It checks your external display and turns on HDR mode if it's off. You can set how often it checks by adjusting the polling rate in the settings.
 
 Build
 -----
