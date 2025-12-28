@@ -13,7 +13,13 @@ swift build -c release
 Run
 ---
 
-To run the bundle:
+To run the build from the project directory:
+
+```bash
+swift run
+```
+
+To run the .app bundle:
 
 - GUI: Control‑click `HDReenable.app` → Open → click Open. In System Settings under Privacy & Security find the Security section and allow the app to be run.
 
