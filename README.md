@@ -33,7 +33,7 @@ swift run
 
 To run the .app bundle:
 
-- GUI: Control‑click `HDReenable.app` → Open → click Open. In System Settings under Privacy & Security find the Security section and allow the app to be run.
+- GUI: Control‑click `HDReenable.app` → Open → click Open. In System Settings under Privacy & Security find the Security section and select "Open anyway" to allow the app to be run.
 
 - Terminal (one‑time):
 	```bash
