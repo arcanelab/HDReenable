@@ -14,7 +14,10 @@ let package = Package(
             name: "HDRMenuApp",
             dependencies: [],
             path: "Sources/HDRMenuApp",
-            resources: []
+            resources: [
+                .copy("Resources/AppIcon.icns"),
+                .copy("Resources/icon.svg")
+            ]
         )
     ]
 )

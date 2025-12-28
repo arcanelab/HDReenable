@@ -3,19 +3,12 @@ HDReenable
 
 A small macOS menu-bar utility that automatically enables HDR mode on external displays using the SkyLight private APIs. Polling rate is configurable.
 
-Build
------
-
-```bash
-swift build -c release
-```
-
 Run
 ---
 
 To run the bundle:
 
-- GUI: Control‑click `HDReenable.app` → Open → click Open. In System Settings under Privacy & Security find the Security section and allow the app to be run.
+Control‑click `HDReenable.app` → Open → click Open. In System Settings under Privacy & Security find the Security section and select "Open anyway" to allow the app to be run.
 
 - Terminal (one‑time):
 	```bash
@@ -39,11 +32,14 @@ MIT
 
 ## Release notes
 
-### 1.0
+### 1.0.2 (2025-12-28)
 
-- Initial release
+- Added application icon
 
 ### 1.0.1 (2025-12-28)
 
 - statusbar: refresh HDR label when menu opens; show "HDR: Checking..." while querying the display
 
+### 1.0.0 (2025-12-27)
+
+- Initial release
