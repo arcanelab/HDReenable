@@ -1,6 +1,6 @@
 import AppKit
 
-class StatusBarController: NSObject, PollerDelegate {
+class StatusBarController: NSObject, PollerDelegate, NSMenuDelegate {
     let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     var preferencesWindow: PreferencesWindowController?
     private var hdrState: Bool? = nil
@@ -31,6 +31,7 @@ class StatusBarController: NSObject, PollerDelegate {
 
         let menu = NSMenu()
         menu.autoenablesItems = false
+        menu.delegate = self
         let hdrItem = NSMenuItem(title: "HDR: Unknown", action: nil, keyEquivalent: "")
         hdrItem.tag = 100
         hdrItem.isEnabled = false
@@ -51,8 +52,6 @@ class StatusBarController: NSObject, PollerDelegate {
 
         statusItem.menu = menu
     }
-
-    
 
     @objc func openPreferences(_ sender: Any?) {
         if preferencesWindow == nil {
@@ -80,6 +79,20 @@ class StatusBarController: NSObject, PollerDelegate {
             title = "HDR: Unknown"
         }
         hdrItem.title = title
+    }
+
+    // MARK: - NSMenuDelegate
+    func menuWillOpen(_ menu: NSMenu) {
+        guard let hdrItem = menu.item(withTag: 100) else { return }
+        hdrItem.title = "HDR: Checking..."
+        DispatchQueue.global(qos: .background).async {
+            let dm = DisplayManager()
+            let s = dm.isHDREnabled()
+            DispatchQueue.main.async {
+                self.hdrState = s
+                self.updateHDRMenu()
+            }
+        }
     }
 
     // MARK: - PollerDelegate
