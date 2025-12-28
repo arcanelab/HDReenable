@@ -44,6 +44,39 @@ To run the .app bundle:
 	sudo spctl --add /path/to/HDReenable.app
 	```
 
+Build the .app bundle
+---------------------
+
+To create a relocatable `.app` bundle from the release build:
+
+```bash
+swift build -c release
+mkdir -p Releases/HDReenable.app/Contents/MacOS
+cp .build/release/HDReenable Releases/HDReenable.app/Contents/MacOS/HDReenable
+cat > Releases/HDReenable.app/Contents/Info.plist <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>HDReenable</string>
+	<key>CFBundleExecutable</key>
+	<string>HDReenable</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.example.HDReenable</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+</dict>
+</plist>
+EOF
+
+# Change the bundle identifier to something else.
+
+# Optionally codesign the app or remove quarantine as described above before running.
+```
+
 Acknowledgements
 -------
 
