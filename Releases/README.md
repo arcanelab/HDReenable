@@ -34,3 +34,16 @@ Thanks to [hoder](https://github.com/kohlschuetter/hoder) for the inspiration.
 License
 -------
 MIT
+
+---
+
+## Release notes
+
+### 1.0
+
+- Initial release
+
+### 1.0.1 (2025-12-28)
+
+- statusbar: refresh HDR label when menu opens; show "HDR: Checking..." while querying the display
+

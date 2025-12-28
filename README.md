@@ -65,7 +65,7 @@ cat > Releases/HDReenable.app/Contents/Info.plist <<EOF
 	<key>CFBundleIdentifier</key>
 	<string>com.example.HDReenable</string>
 	<key>CFBundleVersion</key>
-	<string>1.0</string>
+	<string>1.0.1</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 </dict>
